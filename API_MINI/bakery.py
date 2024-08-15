@@ -14,8 +14,8 @@ def add_bakery():
     Add bakery . Example POST data format
     {
     "bakery_name": "abc",
-    "Artst_name": "abc",
-    :Genre": "abd"
+    "Prouct": "abc",
+    :Quantity": "abd"
     }
     :return: success or error message
     """
@@ -25,7 +25,7 @@ def add_bakery():
         if errors:
             return jsonify(errors), 400
         products = data.get("bakery")
-        customers = data.get("cake")
+        customers = data.get("customer")
         # Check if the bakery already exists based on Artist_name or Record_lable
         existing_bakery = bakery.query.filter(
             (bakery.products == products) | (bakery.customers == customers)
@@ -46,7 +46,7 @@ def add_bakery():
 
 
 @app.route('/bakery/<int:customer_id>', methods=['GET'])
-def get_Song(Song_id):
+def get_bakey(bakery_id):
     """
     Get bakery data based on ID provided
     :param bakery_id: ID of the registered Song.

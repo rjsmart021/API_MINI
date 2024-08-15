@@ -17,66 +17,66 @@ class Bakery(db.Model):
 # schema.py
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from app.models import Movie as MovieModel, Genre as GenreModel, movie_genres, db
+from app.models import Bakery as BakeryModel, Product as productModel, product_genres, db
 from sqlalchemy.orm import Session
 
-class Movie(SQLAlchemyObjectType):
+class Bakery(SQLAlchemyObjectType):
     class Meta:
-        model = MovieModel
+        model = BakeryModel
 
-class Genre(SQLAlchemyObjectType):
+class product(SQLAlchemyObjectType):
     class Meta:
-        model = GenreModel
+        model = productModel
 
 class Query(graphene.ObjectType):
-    movies = graphene.List(Movie)
-    search_movies = graphene.List(Movie, title=graphene.String(), director=graphene.String(), year=graphene.Int())
-    get_movies_by_genre = graphene.List(Movie, genre_id=graphene.Int())
-    get_genre_by_movie = graphene.List(Genre, movie_id=graphene.Int())
+    Bakery = graphene.List(Bakery)
+    search_Bakery = graphene.List(Bakery, title=graphene.String(), director=graphene.String(), year=graphene.Int())
+    get_Bakery_by_product = graphene.List(Bakery, product_id=graphene.Int())
+    get_product_by_Bakery = graphene.List(Product, Bakery_id=graphene.Int())
 
-    def resolve_movies(root, info):
-        return db.session.execute(db.select(MovieModel)).scalars()
+    def resolve_Bakery(root, info):
+        return db.session.execute(db.select(BakeryModel)).scalars()
 
-    def resolve_search_movies(root, info, title=None, director=None, year=None):        
-        query = db.select(MovieModel)
+    def resolve_search_bakery(root, info, title=None, director=None, year=None):        
+        query = db.select(BakeryModel)
         if title:
-            query = query.where(MovieModel.title.ilike(f'%{title}%'))
+            query = query.where(BakeryModel.title.ilike(f'%{title}%'))
         if director:
-            query = query.where(MovieModel.director.ilike(f'%{director}%'))
+            query = query.where(BakeryModel.director.ilike(f'%{director}%'))
         if year:
-            query = query.where(MovieModel.year == year)
+            query = query.where(BakeryModel.year == year)
         results = db.session.execute(query).scalars().all()
         return results
     
-    def resolve_get_movies_by_genre(root, info, genre_id):
-        return db.session.query(MovieModel).join(movie_genres).filter(movie_genres.c.genre_id == genre_id).all()
+    def resolve_get_bakery_by_product(root, info, genre_id):
+        return db.session.query(BakeryModel).join(bakery_product).filter(bakery_product.c.bakery_id == product_id).all()
 
-    def resolve_get_genre_by_movie(root, info, movie_id):
-        return db.session.query(GenreModel).join(movie_genres).filter(movie_genres.c.movie_id == movie_id).all()
+    def resolve_get_product_by_bakery(root, info, bakery_id):
+        return db.session.query(ProductModel).join(bakery_product).filter(bakery_product.c.bakery_id == bakery_id).all()
     
-class AddMovie(graphene.Mutation):
+class Addbakery(graphene.Mutation):
     class Arguments:
         title = graphene.String(required=True)
         director = graphene.String(required=True)
         year = graphene.Int(required=True)
         genres = graphene.List(graphene.String, required=True)
 
-    movie = graphene.Field(Movie)
+    movie = graphene.Field(Bakery)
 
     def mutate(root, info, title, director, year, genres):
 
         # get genres from table, or add them if necessary
         genre_instances = []
-        for genre_name in genres:
-            genre_instance = db.session.query(GenreModel).filter_by(name=genre_name).first()
-            if not genre_instance:
-                genre_instance = GenreModel(name=genre_name)
-            genre_instances.append(genre_instance)
+        for product_name in products:
+            product_instance = db.session.query(procuctModel).filter_by(name=product_name).first()
+            if not product_instance:
+                product_instance = ProductModel(name=genre_name)
+            product_instances.append(product_instance)
 
-        movie = MovieModel(title=title, director=director, year=year, genres=genre_instances) 
-        return AddMovie(movie=movie)
+        Bakery = bakeryModel(Name=Name, price=price, ItemID=ItemID, Calorie=Calorie) 
+        return AddBakery(bakery=bakery)
 
-class UpdateMovie(graphene.Mutation):
+class Updatebakery(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
         title = graphene.String()
@@ -84,96 +84,96 @@ class UpdateMovie(graphene.Mutation):
         year = graphene.Int()
         genres = graphene.List(graphene.String, required=True)
 
-    movie = graphene.Field(Movie)
+    bakery = graphene.Field(Bakery)
 
-    def mutate(root, info, id, title=None, director=None, year=None, genres=None):
-        movie = db.session.get(MovieModel, id)         
-        if not movie:
+    def mutate(root, info, id, Name=None, Price=None, ItemID=None, Calorie=None):
+        bakery = db.session.get(BakeryModel, id)         
+        if not bakery:
             return None
-        if title:    
-            movie.title = title
-        if director:
-            movie.director = director
+        if name:    
+            bakery.name = name
+        if price:
+            bakery.price = price
         if year:
-            movie.year = year
-        if genres:
-            genre_instances = []
-            for genre_name in genres:
-                genre_instance = db.session.query(GenreModel).filter_by(name=genre_name).first()
-                if not genre_instance:
-                    genre_instance = GenreModel(name=genre_name)
-                genre_instances.append(genre_instance)
-            movie.genres = genre_instances
+            bakery.ItemID = ItemID
+        if product:
+            product_instances = []
+            for product_name in products:
+                product_instance = db.session.query(ProductModel).filter_by(name=product_name).first()
+                if not product_instance:
+                    product_instance = ProductModel(name=product_name)
+                product_instances.append(product_instance)
+            bakery.products = product_instances
         db.session.commit()
-        return UpdateMovie(movie=movie)
+        return UpdateBakery(product=prouct)
 
-class DeleteMovie(graphene.Mutation):
+class DeleteBakery(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
 
     message = graphene.String()
 
     def mutate(root, info, id):
-        movie = db.session.get(MovieModel, id)         
-        if not movie:
-            return DeleteMovie(message="That movie was not found")
+        movie = db.session.get(BakeryModel, id)         
+        if not bakery:
+            return DeleteBakery(message="That bakery was not found")
         else:
-            db.session.delete(movie)
+            db.session.delete(bakery)
             db.session.commit()
-            return DeleteMovie(message="Success")
+            return DeleteBakery(message="Success")
 
 
-### GENRE MUTATIONS ###
+### Product MUTATIONS ###
 
-class AddGenre(graphene.Mutation):
+class AddProduct(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
 
-    genre = graphene.Field(Genre)
+    genre = graphene.Field(Product)
 
     def mutate(root, info, name):
-        genre = GenreModel(name=name)
-        return AddGenre(genre=genre)
+        product = ProductModel(name=name)
+        return AddProduct(product=product)
 
-class UpdateGenre(graphene.Mutation):
+class UpdateProduct(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
         name = graphene.String()
 
-    genre = graphene.Field(Genre)
+    product = graphene.Field(Product)
 
     def mutate(root, info, id, name=None):
-        genre = db.session.get(GenreModel, id)         
-        if not genre:
+        product = db.session.get(ProductModel, id)         
+        if not product:
             return None
         if name:    
-            genre.name = name
+            product.name = name
         db.session.commit()
-        return UpdateGenre(genre=genre)
+        return UpdateProductproduct=product)
 
-class DeleteGenre(graphene.Mutation):
+class DeleteProduct(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
 
     message = graphene.String()
 
     def mutate(root, info, id):
-        genre = db.session.get(GenreModel, id)         
+        genre = db.session.get(ProductModel, id)         
         if not genre:
-            return DeleteGenre(message="That genre was not found")
+            return DeleteProduct(message="That genre was not found")
         else:
-            db.session.delete(genre)
+            db.session.delete(product)
             db.session.commit()
-            return DeleteGenre(message="Success")
+            return DeleteProduct(message="Success")
 
 
 class Mutation(graphene.ObjectType):
-    create_movie = AddMovie.Field()
-    update_movie = UpdateMovie.Field()
-    delete_movie = DeleteMovie.Field()
-    create_genre = AddGenre.Field()
-    update_genre = UpdateGenre.Field()
-    delete_genre = DeleteGenre.Field()
+    create_movie = AddBakery.Field()
+    update_movie = UpdateBakery.Field()
+    delete_movie = DeleteBakery.Field()
+    create_genre = AddProduct.Field()
+    update_genre = UpdateProduct.Field()
+    delete_genre = DeleteProduct.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

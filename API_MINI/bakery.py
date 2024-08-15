@@ -24,17 +24,17 @@ def add_bakery():
         errors = bakery_schema.validate(data)
         if errors:
             return jsonify(errors), 400
-        Artist_name = data.get("Artist_name")
-        Genre = data.get("Genre")
+        products = data.get("bakery")
+        customers = data.get("cake")
         # Check if the bakery already exists based on Artist_name or Record_lable
         existing_bakery = bakery.query.filter(
-            (bakery.Artist_name == Artist_name) | (bakery.Genre == Genre)
+            (bakery.products == products) | (bakery.customers == customers)
         ).first()
 
         if existing_bakery:
             return jsonify({"message": f"bakery already existed"})
-        Song = Song(Song_name=data["Song_name"], Artist_name=data["Artist_name"],
-                            Genre=data["Genre"])
+        products = product(product=data["product_name"], Customer=data["Customer"],
+                            customer=data["customer"])
 
         # Add the new customer to the database
         db.session.add(bakery)
@@ -45,12 +45,12 @@ def add_bakery():
         return jsonify({"Error": f"bakery not added. Error {e}"})
 
 
-@app.route('/bakery/<int:Song_id>', methods=['GET'])
+@app.route('/bakery/<int:customer_id>', methods=['GET'])
 def get_Song(Song_id):
     """
     Get bakery data based on ID provided
     :param bakery_id: ID of the registered Song.
-    :return: Song details oif found else Error message
+    :return: customer details oif found else Error message
     """
     try:
         Song = bakery.query.get(bakery_id)
@@ -59,8 +59,8 @@ def get_Song(Song_id):
             bakery_data = {
                 "bakery_id": bakery.bakery_id,
                 "bakery_name": bakery.bakery_name,
-                "Artist": Artist.Artist_Name,
-                "Record_lable": bakery.Record_lable
+                "product": product.Product_name,
+                "Customer": bakery.customer
             }
             return jsonify(bakery_data)
         else:
@@ -79,8 +79,8 @@ def update_user(bakery_id):
     example PUT data to update;
     {
     "bakery_name": "name",
-    "Artist": "Artist_Name",
-    "Genre": "Genre_Name"
+    "product": "product",
+    "customer": "customer"
     }
     :param bakery_id:
     :return:
@@ -94,8 +94,8 @@ def update_user(bakery_id):
             if error:
                 return jsonify(error), 400
             bakery.bakery_name = data.get('bakery_name', bakery.bakery_name)
-            bakery.Artist_Name = data.get('Artist', Artist.Artist_Name)
-            bakery.Genre = data.get('phone_number', Genre.Genre_Name)
+            bakery.Product = data.get('Product', Product.Product)
+            bakery.Customer = data.get('Customer_ID', Customer.Customer)
 
             db.session.commit()
             return jsonify({"message": "bakery updated successfully"})

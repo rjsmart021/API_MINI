@@ -1,4 +1,4 @@
-from ecommerce import db
+from API_MINI import db
 
 
 class Customer(db.Model):

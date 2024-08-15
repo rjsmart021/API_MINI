@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('Name', sa.String(length=255), nullable=False),
     sa.Column('price', sa.String(length=255), nullable=False),
-    sa.Column('calorie', sa.Integer(), nullable=False),
+    sa.Column('category', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

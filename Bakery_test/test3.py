@@ -1,4 +1,4 @@
-"""Add movie table
+"""Add bakery Product table
 
 Revision ID: d9dec67e3c57
 Revises: 
